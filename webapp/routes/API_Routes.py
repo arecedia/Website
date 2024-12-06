@@ -8,7 +8,6 @@ from webapp.models.user_model import User
 from webapp import database
 from webapp.routes.Function_Routes import create_advertisement, update_advertisement, delete_advertisement
 
-log = logging.getLogger(__name__)
 router = APIRouter()
 templates = Jinja2Templates(directory="webapp/templates")
 
