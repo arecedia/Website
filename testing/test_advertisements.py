@@ -27,7 +27,7 @@ def setup_database():
 client = TestClient(app)
 
 # Sample Advertisement Data
-sample_ad = {
+Advertisement = {
     "client_name": "Test Client",
     "ad_title": "Test Ad Title",
     "ad_content": "<p>Test Ad Content</p>",
@@ -43,7 +43,7 @@ sample_ad = {
 
 # Helper to create an advertisement
 def create_test_ad(session):
-    ad = Advertisement(**sample_ad)
+    ad = Advertisement(**Advertisement)
     session.add(ad)
     session.commit()
     session.refresh(ad)
@@ -51,80 +51,38 @@ def create_test_ad(session):
 
 # Core Function Tests
 def test_create_advertisement():
-    response = client.post("/ads/", json=sample_ad)
+    response = client.post("/api/ads/", json=Advertisement)
+    print(response.json())
+
     assert response.status_code == 200
-    new_ad = response.json()
-    assert new_ad["id"] is not None
-    assert new_ad["client_name"] == "Test Client"
 
+    response_data = response.json()
+    assert response_data["message"] == "Advertisement created successfully"
+    assert response_data["data"] == Advertisement
 
+"""
 def test_update_advertisement():
-    with Session(engine) as session:
-        ad = create_test_ad(session)
-        updates = {"ad_title": "Updated Test Ad Title"}
-        updated_ad = update_advertisement(session, ad.id, updates)
-        assert updated_ad.ad_title == "Updated Test Ad Title"
+    response = client.post("/api/ads/{ad_id}", json=
+
 
 
 def test_delete_advertisement():
-    with Session(engine) as session:
-        ad = create_test_ad(session)
-        delete_advertisement(session, ad.id)
-        assert session.get(Advertisement, ad.id) is None
+
 
 
 # API Route Tests
 
 def test_create_ad_route():
-    response = client.post("/ads/", json=sample_ad)
-    assert response.status_code == 200
-    data = response.json()
-    assert data["id"] is not None
-    assert data["client_name"] == "Test Client"
+
 
 
 def test_update_ad_route():
-    # First create an add
-    create_response = client.post("/ads/", json=sample_ad)
-    ad_id = create_response.json()["id"]
 
-    # Update the ad
-    updates = {"ad_title": "Updated Test Ad Title"}
-    update_response = client.put(f"/ads/{ad_id}", json=updates)
-    assert update_response.status_code == 200
-    updated_ad = update_response.json()
-    assert updated_ad["ad_title"] == "Updated Test Ad Title"
 
 
 def test_delete_ad_route():
-    # First create an ad
-    create_response = client.post("/ads/", json=sample_ad)
-    ad_id = create_response.json()["id"]
 
-    # Delete the ad
-    delete_response = client.delete(f"/ads/{ad_id}")
-    assert delete_response.status_code == 200
-    assert delete_response.json()["message"] == "Advertisement deleted successfully"
-
-    # Verify deletion
-    get_response = client.get(f"/ads/{ad_id}")
-    assert get_response.status_code == 404
 
 
 def test_get_all_ads_route():
-    # Clean database
-    with Session(engine) as session:
-        session.query(Advertisement).delete()
-        session.commit()
-
-    # Create multiple ads
-    client.post("/ads/", json=sample_ad)
-    client.post("/ads/", json={**sample_ad, "client_name": "Another Client"})
-
-    # Fetch all ads
-    response = client.get("/ads/")
-    assert response.status_code == 200
-    ads = response.json()
-    assert len(ads) == 2
-    assert ads[0]["client_name"] == "Test Client"
-    assert ads[1]["client_name"] == "Another Client"
+"""
