@@ -25,21 +25,39 @@ class Advertisement(SQLModel, table=True):
     target_audience: str = Field(default=None)
     media_url: str = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, foreign_key="UpdateAdvertisement.updated_at")
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class CreateAdvertisement(SQLModel):
+    client_name: str
+    ad_title: str
+    ad_content: str
+    start_date: datetime
+    end_date: datetime
+    status: str
+    ad_type: str
+    target_url: str
+    placement: str
+    budget: float
+    cost_per_click: float
+    cost_per_impression: float
+    target_audience: str
+    media_url: str
+    created_at: datetime
+
+
 
 class UpdateAdvertisement(SQLModel):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, foreign_key="Advertisement.id")
     client_name: str
     ad_title: str
     ad_content: str
     end_date: datetime
-    status: str = Field(default="active")
+    status: str
     ad_type: str
     target_url: str
     placement: str  # "homepage", "article_page", etc.
-    budget: float = Field(default=0.0)
-    cost_per_click: float = Field(default=0.0)
-    cost_per_impression: float = Field(default=0.0)
-    target_audience: str = Field(default=None)
-    media_url: str = Field(default=None)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    budget: float
+    cost_per_click: float
+    cost_per_impression: float
+    target_audience: str
+    media_url: str

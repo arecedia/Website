@@ -8,62 +8,53 @@ from sqlalchemy.testing.plugin.plugin_base import logging
 from sqlmodel import Session, create_engine, SQLModel
 from starlette.templating import Jinja2Templates
 
-from webapp.models.Advertisement_models import Advertisement, UpdateAdvertisement
-from webapp.models.user_model import User
+from webapp.models.Advertisement_models import Advertisement, CreateAdvertisement, UpdateAdvertisement
+from webapp.models import Analytics_model
+from webapp.models import Article_model
+from webapp.models import comment_model
+from webapp.models import Interaction_model
+from webapp.models import user_model
+
 from webapp import database
 from webapp.routes.Function_Routes import create_advertisement, update_advertisement, delete_advertisement
 
 router = APIRouter()
 templates = Jinja2Templates(directory="webapp/templates")
 
-class Advertisement(BaseModel):
-    client_name: str
-    ad_title: str
-    ad_content: str
-    start_date: datetime
-    end_date: datetime
-    status: str
-    ad_type: str
-    target_url: str
-    placement: str
-    media_url: str
-    budget: float
 
-class UpdateAdvertisement(BaseModel):
-    client_name: str
-    ad_title: str
-    ad_content: str
-    status: str
-    end_date: datetime
-    status: str
-    ad_type: str
-    target_url: str
-    placement: str
-    media_url: str
+@router.post("/ads/", response_model=CreateAdvertisement)
+def create_ad(*,
+              ad_data: CreateAdvertisement,
+              session: Session = Depends(database.get_session)):
+    # Validate date range
+    if ad_data.start_date >= ad_data.end_date:
+        raise HTTPException(status_code=400, detail="Start date must be before the end date.")
 
+    # Create a new Advertisement instance
+    new_ad = Advertisement(
+        client_name=ad_data.client_name,
+        ad_title=ad_data.ad_title,
+        ad_content=ad_data.ad_content,
+        start_date=ad_data.start_date,
+        end_date=ad_data.end_date,
+        status=ad_data.status,
+        ad_type=ad_data.ad_type,
+        target_url=ad_data.target_url,
+        placement=ad_data.placement,
+        budget=ad_data.budget,
+        cost_per_click=ad_data.cost_per_click,
+        cost_per_impression=ad_data.cost_per_impression,
+        target_audience=ad_data.target_audience,
+        media_url=ad_data.media_url,
+        created_at=ad_data.created_at,
+    )
 
-def create_advertisement(*,
-                         session: Session,
-                         ad_data: dict
-                         ):
-    return{"message":"Advertisement created successfully", "data":ad_data}
+    # Add and commit the new advertisement
+    session.add(new_ad)
+    session.commit()
+    session.refresh(new_ad)
 
-
-def update_advertisement(*,
-                         session: Session,
-                         updates: dict
-                         ):
-    return{"message":"Advertisement updated successfully", "updated_info": updates}
-
-@router.post("/ads/")
-async def create_ad(*,
-                    ad_data: Advertisement,
-                    session: Session = Depends(database.get_session),
-):
-    try:
-        return create_advertisement(session=session, ad_data=ad_data.dict())
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return{"message": "Advertisement created successfully", "data":new_ad}
 
 
 @router.put("/ads/{ad_id}")
@@ -73,9 +64,21 @@ def update_ad(*,
               session: Session = Depends(database.get_session),
               ):
     try:
-        return update_advertisement(session=session, updates=updates.dict(), ad_id=ad_id)
+        advertisement = session.get(Advertisement, ad_id)
+        if not advertisement:
+            raise HTTPException(status_code=404, detaul="Advertisement not found")
+
+        for key, value in updates.dict(exclude_unset=True).items():
+            setattr(advertisement, key, value)
+
+        advertisement.updated_at = datetime.utcnow()
+        session.add(advertisement)
+        session.commit()
+        session.refresh(advertisement)
+
+        return {"message": "Advertisement updated successfully", "updated_info": advertisement}
     except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.delete("/ads/{ad_id}")
