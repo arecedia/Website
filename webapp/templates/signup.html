@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="http://127.0.0.1:8000/static/css/login.css">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="http://127.0.0.1:8000/static/css/signup.css">
 </head>
 <body>
     <main>
@@ -21,25 +21,33 @@
             </ul>
         </nav>
 
-        <div class="login-form">
-            <h1>Login</h1>
+        <div class="register-form">
+            <h1>Register</h1>
             <form method="POST">
                 <div class="mb-3">
-                    <label for="email/username"></label>
-                    <input type="text" id="email/username" name="email/username" placeholder="Enter Email or Username" required>
+                    <label for="username"></label>
+                    <input type="text" id="username" name="username" placeholder="Enter Username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email"></label>
+                    <input type="email" id="email" name="email" placeholder="Enter Email" required>
                 </div>
                 <div class="mb-3">
                     <label for="password"></label>
                     <input type="password" id="password" name="password" placeholder="password" required>
                 </div>
+                <div class="mb-3">
+                    <label for="cPassword"></label>
+                    <input type="password" id="cPassword" name="cPassword" placeholder="Confirm Password" required>
+                </div>
 
-                <div class="register-link">
-                    <p>Don't have an account? <a href="http://127.0.0.1:8000/signup.html">Register Today!</a></p>
+                <div class="login-link">
+                    <p>Have an account? <a href="http://127.0.0.1:8000/login.html">Login!</a></p>
                 </div>
                 <button class="btn btn-primary" id="submitBtn" type="submit" onclick="auth()">Submit</button>
             </form>
         </div>
     </main>
-    <script src="http://127.0.0.1:8000/static/js/login.js"></script>
+    <script src="http://127.0.0.1:8000/static/js/signup.js"></script>
     <script src="http://127.0.0.1:8000/static/js/Dark_Light_toggle.js"></script>
 </body>
