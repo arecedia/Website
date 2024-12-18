@@ -17,7 +17,6 @@ from webapp.models.Interaction_model import Interaction, CreateInteraction, Upda
 from webapp.models.user_model import User, CreateUser, UserUpdate
 
 from webapp import database
-from webapp.routes.Function_Routes import create_advertisement, update_advertisement, delete_advertisement
 
 router = APIRouter()
 templates = Jinja2Templates(directory="webapp/templates")
@@ -88,7 +87,7 @@ def delete_ad(*,
               session: Session = Depends(database.get_session),
               ):
     try:
-        delete_advertisement(session, id)
+        delete_ad(session, id)
         return {"message": "Advertisement deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))

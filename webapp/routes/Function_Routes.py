@@ -31,36 +31,34 @@ async def login_code(
     """
 
     body = await request.json()
-    email = body.get("email/password")
-    username = body.get("email/password")
+    email = body.get("email/username")
+    username = body.get("email/username")
     password = body.get("password")
 
     qry = select(user_model.User).where(user_model.User.email == email)
-    result = session.exec(qry).first()
-    if result:
+    result1 = session.exec(qry).first()
+    if result1:
         # Check if the entered detail is an email or a username
         isEmail = True
-        result = None
 
     qry = select(user_model.User).where(user_model.User.username == username)
-    result = session.exec(qry).first()
-    if result:
+    result2 = session.exec(qry).first()
+    if result2:
         isUsername = True
-        result = None
 
     if isEmail == True:
         # Check if the password is correct
-        if result.verify_password(password):
+        if result1.verify_password(password):
             # Create an Access token
-            if result.admin == False:
+            if result1.admin == False:
                 encoded_jwt = auth_service.create_access_token(
                     data={"audience": "User",
-                          "subject": result.id.hex}
+                          "subject": result1.id.hex}
                 )
             else:
                 encoded_jwt = auth_service.create_access_token(
                     data={"audience": "Admin",
-                          "subject": result.id.hex}
+                          "subject": result1.id.hex}
                 )
             response = JSONResponse(
                 content={"success": True,
@@ -71,17 +69,17 @@ async def login_code(
             return JSONResponse(content={"success": False, "message": "Invalid email or password"})
     elif isUsername == True:
         # Check if the password is correct
-        if result.verify_password(password):
+        if result2.verify_password(password):
             # Create an Access token
-            if result.admin == False:
+            if result2.admin == False:
                 encoded_jwt = auth_service.create_access_token(
                     data={"audience": "User",
-                          "subject": result.id.hex}
+                          "subject": result2.id.hex}
                 )
             else:
                 encoded_jwt = auth_service.create_access_token(
                     data={"audience": "Admin",
-                          "subject": result.id.hex}
+                          "subject": result2.id.hex}
                 )
             response = JSONResponse(
                 content={"success": True,
@@ -92,13 +90,18 @@ async def login_code(
             return JSONResponse(content={"success": False, "message": "Invalid username or password"})
     else:
         print("No User Found")
-
-    admin = result.admin
-
-    if admin == True:
-        encoded_jwt = auth_service.create_access_token(email=email, data={"audience": "Admin", "subject": result.id.hex})
-    elif admin == False:
-        encoded_jwt = auth_service.create_access_token(email=email, data={"audience": "User", "subject": result.id.hex})
+    if isEmail:
+        admin = result1.admin
+        if admin == True:
+            encoded_jwt = auth_service.create_access_token(email=email, data={"audience": "Admin", "subject": result1.id.hex})
+        elif admin == False:
+            encoded_jwt = auth_service.create_access_token(email=email, data={"audience": "User", "subject": result1.id.hex})
+    if isUsername:
+        admin = result2.admin
+        if admin == True:
+            encoded_jwt = auth_service.create_access_token(email=email, data={"audience": "Admin", "subject": result2.id.hex})
+        elif admin == False:
+            encoded_jwt = auth_service.create_access_token(email=email, data={"audience": "User", "subject": result2.id.hex})
 
     response = JSONResponse(content={"success": True, "message": "Login Successful", "redirect_url": "http://127.0.0.1:8000"})
     response.set_cookie(key="access_token", value=encoded_jwt)
@@ -115,8 +118,8 @@ async def signup_code(*,
     """
 
     body = await request.json()
-    email = body.get("email")
     username = body.get("username")
+    email = body.get("email")
     password = body.get("password")
     cPassword = body.get("cPassword")
 

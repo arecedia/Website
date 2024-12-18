@@ -19,10 +19,12 @@ def create_app():
     from webapp.routes import API_Routes
     from webapp.routes import Function_Routes
     from webapp.routes import View_Routes
+    from webapp.auth import routes as auth_routes
 
     app.include_router(API_Routes.router, prefix="/api", tags=["API"])
-    app.include_router(Function_Routes.router, prefix="/Function", tags=["Functions"])
+    app.include_router(Function_Routes.router, prefix="/function", tags=["Functions"])
     app.include_router(View_Routes.router, prefix="", tags=["Display"])
+    app.include_router(auth_routes.router, prefix="/api/auth", tags=["auth"])
 
     if os.getenv("ENV") != "TEST":
         static_dir = "webapp/static"
