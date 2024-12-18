@@ -31,6 +31,11 @@ def create_app():
         else:
             print(f"Static Directory '{static_dir}' does not exist, skipping mounting")
             app.templates = Jinja2Templates(directory="webapp/templates")
+            template_dir = "webapp/templates"
+            if os.path.exists(template_dir):
+                print(f"Template directory is: {template_dir}")
+            else:
+                print(f"Template Directory '{template_dir}' does not exist")
     return app
 
 app = create_app()

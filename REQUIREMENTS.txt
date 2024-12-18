@@ -1,0 +1,8 @@
+fastapi[standard]
+pytest
+httpx
+sqlmodel
+pydantic
+passlib
+jinja2
+pyjwt
